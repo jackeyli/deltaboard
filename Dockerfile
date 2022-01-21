@@ -25,15 +25,25 @@ ADD web/vue.config.js vue.config.js
 
 RUN npm run build 
 
-FROM deltampc/detlaboard-base:dev
+FROM jupyterhub/jupyterhub:1.4.2 as pybuilder
+
+WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN pip wheel -w whls -r requirements.txt
+
+FROM jupyterhub/jupyterhub:1.4.2
 # Create oauthenticator directory and put necessary files in it
-WORKDIR /application/installation
-RUN python3 -m pip install delta-task==0.1.2
+
 WORKDIR /application
+COPY --from=pybuilder /app/whls /application/whls
 COPY --from=builder /application/main /application/main
 COPY --from=webbuilder /application/web/dist /application/web
 
-RUN mkdir /srv/oauthenticator && \
+RUN apt-get update -y && \
+    apt-get install -y gettext sqlite3 nginx && \
+    pip install --no-cache-dir whls/*.whl && \
+    rm -rf whls && \
+    mkdir /srv/oauthenticator && \
     mkdir /srv/ipython && \
     mkdir /srv/ipython/examples && \
     mkdir /root/.jupyter

@@ -4,6 +4,7 @@
       <div class="table-ctn">
          <div class="tbl-wrapper">
             <el-table :data="tableData" @row-click="openDetail" row-class-name="clickable">
+               <el-table-column :label="$t('dashboard.tasklist.task_id')" prop="id"></el-table-column>
                <el-table-column :label="$t('dashboard.tasklist.task_name')" prop="name"></el-table-column>
                <el-table-column :label="$t('dashboard.tasklist.task_type')" prop="type"></el-table-column>
                <el-table-column :label="$t('dashboard.tasklist.creator_node')" prop="creator">
@@ -24,13 +25,16 @@
                      <el-tag type="success" v-else-if="row.status == $appGlobal.constants.TASK_STATUS_RUNNING">
                         {{$t('dashboard.tasklist.running')}}
                      </el-tag>
+                     <el-tag type="danger" v-else-if="row.status == $appGlobal.constants.TASK_STATUS_ERROR">
+                        {{$t('dashboard.tasklist.error')}}
+                     </el-tag>
                      <el-tag type="info" v-else>
                         {{$t('dashboard.tasklist.finished')}}
                      </el-tag>
                   </template>
                </el-table-column>
                <el-table-column prop="created_at" :label="$t('common.created_at')">{{  }}
-                  <template v-slot="{ row }">{{ row.created_at | second2Date }}</template>
+                  <template v-slot="{ row }">{{ (row.created_at / 1000) | second2Date }}</template>
                </el-table-column>
             </el-table> 
          </div>  
